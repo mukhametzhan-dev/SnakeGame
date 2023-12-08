@@ -109,7 +109,7 @@ public class SnakeGame extends Application {
     private void initGame() {
         snake.clear();
         snake.add(new cord(WIDTH / 2, HEIGHT / 2));
-        generateFood();
+        gf();
         gameOver = false;
         gamePaused = false;
     }
@@ -144,41 +144,53 @@ public class SnakeGame extends Application {
     snake.addFirst(newHead);
     if (newHead.equals(food)) {
         SPEED++;
-        generateFood();
+        gf();
     } else {
         snake.removeLast();
     }
 }
 
 
-    private void checkCollision() {
-        cord headLocation = snake.getFirst();
+private void checkCollision() {
+    cord headLocation = snake.getFirst();
+    Iterator<cord> iterator = snake.iterator();
+
+    while (iterator.hasNext()) {
+        cord point = iterator.next();
+        if (point != headLocation && point.equals(headLocation)) {
+            gameOver = true;
+            showGameOverDialog();
+            break;
+        }
+    }
+}
+
+
+
+
+
+// ...
+
+private void gf() {
+    boolean validPosition;
+    int x, y;
+    Random random = new Random();
+
+    do {
+        validPosition = true;
+        x = random.nextInt(WIDTH);
+        y = random.nextInt(HEIGHT);
+
         for (cord point : snake) {
-            if (point != headLocation && point.equals(headLocation)) {
-                gameOver = true;
-                showGameOverDialog();
+            if (point.getX() == x && point.getY() == y) {
+                validPosition = false;
                 break;
             }
         }
-    }
+    } while (!validPosition);
 
-
-    private void generateFood() {
-        boolean validPosition;
-        int x, y;
-        do {
-            validPosition = true;
-            x = (int) (Math.random() * WIDTH);
-            y = (int) (Math.random() * HEIGHT);
-            for (cord point : snake) {
-                if (point.getX() == x && point.getY() == y) {
-                    validPosition = false;
-                    break;
-                }
-            }
-        } while (!validPosition);
-        food = new cord(x, y);
-    }
+    food = new cord(x, y);
+}
 
 
     private void paint(GraphicsContext gc) {
